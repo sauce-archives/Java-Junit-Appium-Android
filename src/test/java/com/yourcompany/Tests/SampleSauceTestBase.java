@@ -142,7 +142,7 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
         browsers.add(new String[] {"Android", "Android Emulator", "4.3", "1.4.16", "portrait"});
         browsers.add(new String[] {"Android", "Google Nexus 7 HD Emulator", "4.4", "1.4.16", "portrait"});
         //Real device target
-        //browsers.add(new String[] {"Android", "Samsung Galaxy S4 device", "4.4", "1.4.16", "portrait"});
+        browsers.add(new String[] {"Android", "Samsung Galaxy S4 device", "4.4", "1.4.16", "portrait"});
 
         return browsers;
     }
