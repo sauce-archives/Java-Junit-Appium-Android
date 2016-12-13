@@ -6,28 +6,19 @@ package com.yourcompany.Tests;
 
 
 import com.saucelabs.common.SauceOnDemandAuthentication;
-
-import com.yourcompany.TestRules.RetryRule;
-
+import com.saucelabs.common.SauceOnDemandSessionIdProvider;
+import com.saucelabs.junit.ConcurrentParameterized;
+import com.saucelabs.junit.SauceOnDemandTestWatcher;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.saucelabs.junit.ConcurrentParameterized;
-import com.saucelabs.junit.SauceOnDemandTestWatcher;
-
 import java.net.URL;
 import java.util.LinkedList;
-
-import com.saucelabs.common.SauceOnDemandSessionIdProvider;
-import com.yourcompany.Utils.*;
-
-import io.appium.java_client.AppiumDriver;
 
 
 /**
@@ -41,13 +32,13 @@ import io.appium.java_client.AppiumDriver;
  */
 @Ignore
 @RunWith(ConcurrentParameterized.class)
-public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
+public class TestBase implements SauceOnDemandSessionIdProvider {
 
-    public static String seleniumURI;
-    public static String buildTag = System.getenv("BUILD_TAG");
-    public static String app = null;
     public static String username = System.getenv("SAUCE_USERNAME");
     public static String accessKey = System.getenv("SAUCE_ACCESS_KEY");
+    public static String seleniumURI;
+    public static String buildTag;
+    public static String app;
     /**
      * Constructs a {@link SauceOnDemandAuthentication} instance using the supplied user name/access
      * key.  To use the authentication supplied by environment variables or from an external file,
@@ -68,40 +59,12 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
         }
     };
 
-    /**
-     * Test decorated with @Retry will be run 3 times in case they fail using this rule.
-     */
-    @Rule
-    public RetryRule rule = new RetryRule(3);
-
-    /**
-     * Represents the browser to be used as part of the test run.
-     */
     protected String platformName;
-    /**
-     * Represents the operating system to be used as part of the test run.
-     */
     protected String appiumVersion;
-    /**
-     * Represents the version of the browser to be used as part of the test run.
-     */
     protected String platformVersion;
-    /**
-     * Represents the deviceName of mobile device
-     */
     protected String deviceName;
-    /**
-     * Represents the device-orientation of mobile device
-     */
     protected String deviceOrientation;
-    /**
-     * Instance variable which contains the Sauce Job Id.
-     */
     protected String sessionId;
-
-    /**
-     * The {@link WebDriver} instance which is used to perform browser interactions with.
-     */
     protected AppiumDriver driver;
 
     /**
@@ -117,7 +80,7 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
      * @param deviceOrientation device orientation
      */
 
-    public SampleSauceTestBase(
+    public TestBase(
             String platformName,
             String deviceName,
             String platformVersion,
@@ -139,25 +102,11 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
     public static LinkedList browsersStrings() {
         LinkedList<String[]> browsers = new LinkedList<>();
 
-        browsers.add(new String[] {"Android", "Android Emulator", "4.3", "1.4.16", "portrait"});
-        browsers.add(new String[] {"Android", "Google Nexus 7 HD Emulator", "4.4", "1.4.16", "portrait"});
-        //Real device target
-        //browsers.add(new String[] {"Android", "Samsung Galaxy S4 device", "4.4", "1.4.16", "portrait"});
+        browsers.add(new String[]{"Android", "Android Emulator", "5.0", "1.5.3", "portrait"});
+        browsers.add(new String[]{"Android", "Samsung Galaxy S4 Emulator", "4.4", "1.5.3", "portrait"});
+        //browsers.add(new String[]{"Android", "Samsung Galaxy S6 Device", "6.0", "1.5.3", "portrait"});
 
         return browsers;
-    }
-
-    @BeforeClass
-    public static void setupClass() throws Exception{
-        //get the uri to send the commands to.
-        seleniumURI = SauceHelpers.buildSauceUri();
-        //You can set this manually on manual runs.
-        app = System.getProperty("appPath");
-        if (app != null){
-            app = SauceHelpers.uploadAppToSauceStorage(app, username, accessKey);
-        } else {
-            System.err.println("No app no test! " + app);
-        }
     }
 
     /**
@@ -167,26 +116,19 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
      * the username and access key populated by the {@link #authentication} instance.
      *
      * @throws Exception if an error occurs during the creation of the {@link RemoteWebDriver}
-     * instance.
+     *                   instance.
      */
     @Before
     public void setUp() throws Exception {
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        if (this.platformName != null)
-            capabilities.setCapability("platformName", this.platformName);
-        if (this.platformVersion != null)
-            capabilities.setCapability("platformVersion", this.platformVersion);
-        if (this.deviceName != null)
-            capabilities.setCapability("deviceName", this.deviceName);
-        if (this.deviceOrientation != null)
-            capabilities.setCapability("deviceOrientation", this.deviceOrientation);
-        if (this.appiumVersion != null)
-            capabilities.setCapability("appiumVersion", this.appiumVersion);
-        if (app != null)
-            capabilities.setCapability("app", app);
-        else
-            throw new Exception("App path needs to be specified for this test to run!");
+        capabilities.setCapability("platformName", this.platformName);
+        capabilities.setCapability("platformVersion", this.platformVersion);
+        capabilities.setCapability("deviceName", this.deviceName);
+        capabilities.setCapability("deviceOrientation", this.deviceOrientation);
+        capabilities.setCapability("appiumVersion", this.appiumVersion);
+        capabilities.setCapability("app", app);
+
 
         String methodName = name.getMethodName();
         capabilities.setCapability("name", methodName);
@@ -216,5 +158,16 @@ public class SampleSauceTestBase implements SauceOnDemandSessionIdProvider {
     @Override
     public String getSessionId() {
         return sessionId;
+    }
+
+    @BeforeClass
+    public static void setupClass() {
+        //get the uri to send the commands to.
+        seleniumURI = "@ondemand.saucelabs.com:443";
+        //If available add build tag. When running under Jenkins BUILD_TAG is automatically set.
+        //You can set this manually on manual runs.
+        buildTag = System.getenv("BUILD_TAG");
+
+        app = "https://github.com/saucelabs-sample-test-frameworks/GuineaPig-Sample-App/blob/master/android/GuineaPigApp-debug.apk?raw=true";
     }
 }
