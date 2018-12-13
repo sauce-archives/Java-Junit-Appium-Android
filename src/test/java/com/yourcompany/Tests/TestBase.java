@@ -102,8 +102,8 @@ public class TestBase implements SauceOnDemandSessionIdProvider {
     public static LinkedList browsersStrings() {
         LinkedList<String[]> browsers = new LinkedList<>();
 
-        browsers.add(new String[]{"Android", "Android Emulator", "5.0", "1.5.3", "portrait"});
-        browsers.add(new String[]{"Android", "Samsung Galaxy S4 Emulator", "4.4", "1.5.3", "portrait"});
+        browsers.add(new String[]{"Android", "Android Emulator", "5.0", "1.9.1", "portrait"});
+        browsers.add(new String[]{"Android", "Samsung Galaxy S4 Emulator", "4.4", "1.9.1", "portrait"});
         //browsers.add(new String[]{"Android", "Samsung Galaxy S6 Device", "6.0", "1.5.3", "portrait"});
 
         return browsers;
