@@ -59,6 +59,6 @@ public class GuineaPigPage {
      * In appium there's no way of doing this with a generalized method for iOS as of yet.
      */
     public void hideKeyboard() {
-        this.h1Text.click();
+        driver.navigate().back();
     }
 }
